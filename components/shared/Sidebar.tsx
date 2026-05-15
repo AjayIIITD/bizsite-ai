@@ -23,10 +23,9 @@ interface SidebarProps {
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Edit Website", href: "/dashboard/edit", icon: FileEdit },
-  { label: "Templates", href: "/dashboard/templates", icon: LayoutTemplate },
-  { label: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings },
+  { label: "Templates", href: "/templates", icon: LayoutTemplate },
+  { label: "Analytics", href: "/analytics", icon: BarChart3 },
+  { label: "Settings", href: "/settings", icon: Settings },
 ]
 
 export default function Sidebar({ siteSlug }: SidebarProps) {

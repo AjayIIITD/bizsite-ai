@@ -63,6 +63,7 @@ export default function OnboardingPage() {
 
   // Step 4: Result
   const [slug, setSlug] = useState("")
+  const [businessId, setBusinessId] = useState("")
   const [publishing, setPublishing] = useState(false)
 
   useEffect(() => {
@@ -171,6 +172,7 @@ export default function OnboardingPage() {
       }
 
       setSlug(business.slug)
+      setBusinessId(business.id)
       setStep(4)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
@@ -431,7 +433,7 @@ export default function OnboardingPage() {
                 View My Site
               </a>
               <a
-                href={`/editor/${slug}`}
+                href={`/editor/${businessId}`}
                 className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground"
               >
                 <Edit3 className="size-4" />
