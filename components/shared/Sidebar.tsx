@@ -12,7 +12,9 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
+  SunMoon,
 } from "lucide-react"
+import { useTheme } from "./ThemeProvider"
 import { cn } from "@/lib/utils"
 
 interface SidebarProps {
@@ -30,6 +32,7 @@ const NAV_ITEMS = [
 export default function Sidebar({ siteSlug }: SidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
+  const { theme, toggle } = useTheme()
 
   return (
     <aside
@@ -76,7 +79,17 @@ export default function Sidebar({ siteSlug }: SidebarProps) {
         })}
       </nav>
 
-      <div className="border-t p-3">
+      <div className="border-t p-3 space-y-1">
+        <button
+          onClick={toggle}
+          className={cn(
+            "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+            collapsed && "justify-center"
+          )}
+        >
+          <SunMoon className="h-5 w-5 shrink-0" />
+          {!collapsed && <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>}
+        </button>
         <Link
           href={siteSlug ? `/${siteSlug}` : "/"}
           target="_blank"

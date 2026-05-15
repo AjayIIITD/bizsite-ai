@@ -1,4 +1,5 @@
 import Navbar from "@/components/shared/Navbar"
+import ThemeProvider from "@/components/shared/ThemeProvider"
 
 export default function MarketingLayout({
   children,
@@ -6,14 +7,16 @@ export default function MarketingLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar />
-      <main className="flex-1">{children}</main>
-      <footer className="border-t py-8">
-        <div className="mx-auto max-w-7xl px-4 text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} BizSite. Made in India for Indian Businesses.
-        </div>
-      </footer>
-    </div>
+    <ThemeProvider>
+      <div className="flex min-h-screen flex-col">
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <footer className="border-t py-8">
+          <div className="mx-auto max-w-7xl px-4 text-center text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} BizSite. Made in India for Indian Businesses.
+          </div>
+        </footer>
+      </div>
+    </ThemeProvider>
   )
 }

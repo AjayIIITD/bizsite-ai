@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Globe } from "lucide-react"
+import ThemeToggle from "./ThemeToggle"
 
 export default function Navbar() {
   return (
@@ -11,7 +12,8 @@ export default function Navbar() {
           <Globe className="size-6 text-primary" />
           BizSite
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Link
             href="/login"
             className="inline-flex h-9 items-center justify-center rounded-lg px-4 text-sm font-medium transition-colors hover:bg-muted hover:text-foreground"
