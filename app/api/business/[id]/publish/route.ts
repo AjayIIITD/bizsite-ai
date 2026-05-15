@@ -1,8 +1,14 @@
 export const dynamic = "force-dynamic"
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const { id } = await params
 
   try {
@@ -13,6 +19,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     if (!business) {
       return NextResponse.json({ error: "Business not found" }, { status: 404 })
+    }
+
+    if (business.userId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     if (!business.website) {

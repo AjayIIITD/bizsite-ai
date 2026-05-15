@@ -21,11 +21,11 @@ export async function generateContent(businessName: string, description: string)
   return res.json()
 }
 
-export async function suggestColors(businessName: string, description: string) {
+export async function suggestColors(category: string, preference?: string) {
   const res = await fetch("/api/ai/suggest-colors", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ businessName, description }),
+    body: JSON.stringify({ category, preference }),
   })
   if (!res.ok) throw new Error("Failed to suggest colors")
   return res.json()
