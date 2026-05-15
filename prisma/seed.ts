@@ -1,566 +1,107 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client"
+import { PrismaPg } from "@prisma/adapter-pg"
+import pg from "pg"
 
-const BusinessCategory = {
-  RESTAURANT: "Restaurant",
-  SALON: "Salon",
-  SHOP: "Shop",
-  SERVICE: "Service",
-  FITNESS: "Fitness",
-} as const;
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
 
-const prisma = new PrismaClient();
-
-const dukaanSections = [
+const templates = [
   {
-    id: "hero",
-    type: "HERO",
-    content: {
-      heading: "Your Store Name",
-      subheading: "Discover quality products at unbeatable prices — your one-stop shop for everything you need.",
-      ctaText: "Shop Now",
-      ctaLink: "#contact",
-      backgroundImage: "",
-    },
-    order: 0,
-    settings: { fullHeight: true, overlay: true },
+    name: "Dukaan",
+    description: "Perfect for kirana stores, clothing shops, electronics",
+    category: "SHOP",
+    thumbnail: "/templates/shop.jpg",
+    popular: true,
+    sections: [
+      { id: "hero", type: "HERO", content: { heading: "Aapka Store", subheading: "Quality products, unbeatable prices", ctaText: "Shop Now", ctaLink: "#contact", layout: "center" }, order: 0, settings: {} },
+      { id: "about", type: "ABOUT", content: { heading: "Hamare Baare Mein", text: "Humare store mein aapko milegi best quality products at reasonable prices. Customer satisfaction humari priority hai." }, order: 1, settings: {} },
+      { id: "services", type: "SERVICES", content: { heading: "Hamare Products", items: [{ name: "Daily Essentials", description: "All daily use items available" }, { name: "Special Offers", description: "Weekly deals and discounts" }, { name: "Bulk Orders", description: "Special prices on bulk purchases" }] }, order: 2, settings: {} },
+      { id: "contact", type: "CONTACT", content: { heading: "Contact Karein", showForm: true }, order: 3, settings: {} },
+      { id: "footer", type: "FOOTER", content: { copyright: "© 2024 Aapka Store. All rights reserved." }, order: 4, settings: {} },
+    ],
+    styles: { colors: { primary: "#2563EB", secondary: "#059669", accent: "#F59E0B" }, typography: { heading: "Inter", body: "Inter" } },
   },
   {
-    id: "about",
-    type: "ABOUT",
-    content: {
-      heading: "About Our Store",
-      content:
-        "Welcome to our store. We take pride in offering a carefully curated selection of products that combine quality with affordability. Our commitment to customer satisfaction and community values has made us a trusted name in the neighbourhood.",
-      image: "",
-    },
-    order: 1,
-    settings: { layout: "side-by-side" },
+    name: "Swad",
+    description: "Ideal for restaurants, dhabas, cafes, cloud kitchens",
+    category: "RESTAURANT",
+    thumbnail: "/templates/restaurant.jpg",
+    popular: true,
+    sections: [
+      { id: "hero", type: "HERO", content: { heading: "Swad Restaurant", subheading: "Authentic Indian taste since 2010", ctaText: "Order Now", ctaLink: "#contact", layout: "center" }, order: 0, settings: {} },
+      { id: "about", type: "ABOUT", content: { heading: "Hamari Kahani", text: "Pure Indian spices, traditional recipes, aur apke liye pyaar se banaya gaya khana." }, order: 1, settings: {} },
+      { id: "services", type: "SERVICES", content: { heading: "Menu", items: [{ name: "Starters", description: "Crispy and delicious" }, { name: "Main Course", description: "Rich and flavorful" }, { name: "Desserts", description: "Sweet endings" }] }, order: 2, settings: {} },
+      { id: "testimonials", type: "TESTIMONIALS", content: { heading: "Kya Kehte Hain Customers", items: [{ name: "Rahul", text: "Best food in town!" }] }, order: 3, settings: {} },
+      { id: "map", type: "MAP", content: { address: "Main Road, City Center" }, order: 4, settings: {} },
+      { id: "contact", type: "CONTACT", content: { heading: "Order Karein", showForm: true, phone: "+91-9876543210" }, order: 5, settings: {} },
+      { id: "footer", type: "FOOTER", content: { copyright: "© 2024 Swad Restaurant" }, order: 6, settings: {} },
+    ],
+    styles: { colors: { primary: "#DC2626", secondary: "#EA580C", accent: "#FBBF24" }, typography: { heading: "Inter", body: "Inter" } },
   },
   {
-    id: "services",
-    type: "SERVICES",
-    content: {
-      heading: "What We Offer",
-      services: [
-        { title: "Quality Products", description: "Handpicked items from trusted brands and local artisans.", price: "" },
-        { title: "Fast Delivery", description: "Get your orders delivered to your doorstep in record time.", price: "" },
-        { title: "Easy Returns", description: "Hassle-free returns within 7 days of purchase.", price: "" },
-      ],
-    },
-    order: 2,
-    settings: { columns: 3 },
+    name: "Saundarya",
+    description: "For salons, beauty parlors, barbershops",
+    category: "SALON",
+    thumbnail: "/templates/salon.jpg",
+    popular: false,
+    sections: [
+      { id: "hero", type: "HERO", content: { heading: "Saundarya Salon", subheading: "Beauty that speaks", ctaText: "Book Appointment", ctaLink: "#contact", layout: "center" }, order: 0, settings: {} },
+      { id: "about", type: "ABOUT", content: { heading: "Hamare Baare Mein", text: "Expert stylists, premium products, aur aapke liye perfect look." }, order: 1, settings: {} },
+      { id: "services", type: "SERVICES", content: { heading: "Services", items: [{ name: "Haircut", description: "Professional haircut & styling" }, { name: "Facial", description: "Glowing skin treatments" }, { name: "Manicure", description: "Nail care & art" }] }, order: 2, settings: {} },
+      { id: "gallery", type: "GALLERY", content: { heading: "Hamara Work", images: [] }, order: 3, settings: {} },
+      { id: "contact", type: "CONTACT", content: { heading: "Book Now", showForm: true, phone: "+91-9876543210" }, order: 4, settings: {} },
+      { id: "footer", type: "FOOTER", content: { copyright: "© 2024 Saundarya Salon" }, order: 5, settings: {} },
+    ],
+    styles: { colors: { primary: "#7C3AED", secondary: "#DB2777", accent: "#F472B6" }, typography: { heading: "Inter", body: "Inter" } },
   },
   {
-    id: "gallery",
-    type: "GALLERY",
-    content: {
-      heading: "Our Collection",
-      images: [],
-    },
-    order: 3,
-    settings: { layout: "grid", columns: 3 },
+    name: "Seva",
+    description: "For plumbers, electricians, tutors, photographers",
+    category: "SERVICE",
+    thumbnail: "/templates/service.jpg",
+    popular: false,
+    sections: [
+      { id: "hero", type: "HERO", content: { heading: "Seva Services", subheading: "Professional service, trust since years", ctaText: "Book Now", ctaLink: "#contact", layout: "center" }, order: 0, settings: {} },
+      { id: "about", type: "ABOUT", content: { heading: "Hamare Baare Mein", text: "Experienced professionals ready to serve you at your doorstep." }, order: 1, settings: {} },
+      { id: "services", type: "SERVICES", content: { heading: "Services", items: [{ name: "Repair", description: "Fast and reliable repairs" }, { name: "Installation", description: "Professional installation" }, { name: "Maintenance", description: "Regular maintenance plans" }] }, order: 2, settings: {} },
+      { id: "contact", type: "CONTACT", content: { heading: "Call Karein", showForm: true, phone: "+91-9876543210" }, order: 3, settings: {} },
+      { id: "footer", type: "FOOTER", content: { copyright: "© 2024 Seva Services" }, order: 4, settings: {} },
+    ],
+    styles: { colors: { primary: "#2563EB", secondary: "#0891B2", accent: "#06B6D4" }, typography: { heading: "Inter", body: "Inter" } },
   },
   {
-    id: "contact",
-    type: "CONTACT",
-    content: {
-      heading: "Get in Touch",
-      email: "store@example.com",
-      phone: "+91 9876543210",
-      address: "123, Main Bazaar, City Center, Your City",
-    },
-    order: 4,
-    settings: {},
+    name: "Tandrusti",
+    description: "For gyms, yoga studios, trainers",
+    category: "FITNESS",
+    thumbnail: "/templates/fitness.jpg",
+    popular: false,
+    sections: [
+      { id: "hero", type: "HERO", content: { heading: "Tandrusti Fitness", subheading: "Transform your body, transform your life", ctaText: "Free Trial", ctaLink: "#contact", layout: "center" }, order: 0, settings: {} },
+      { id: "about", type: "ABOUT", content: { heading: "Hamare Baare Mein", text: "State-of-the-art equipment, expert trainers, and a supportive community." }, order: 1, settings: {} },
+      { id: "services", type: "SERVICES", content: { heading: "Membership Plans", items: [{ name: "Basic", description: "Gym access" }, { name: "Pro", description: "Gym + Classes" }, { name: "Elite", description: "Personal training" }] }, order: 2, settings: {} },
+      { id: "testimonials", type: "TESTIMONIALS", content: { heading: "Success Stories", items: [{ name: "Amit", text: "Lost 10kg in 3 months!" }] }, order: 3, settings: {} },
+      { id: "contact", type: "CONTACT", content: { heading: "Join Today", showForm: true, phone: "+91-9876543210" }, order: 4, settings: {} },
+      { id: "footer", type: "FOOTER", content: { copyright: "© 2024 Tandrusti Fitness" }, order: 5, settings: {} },
+    ],
+    styles: { colors: { primary: "#DC2626", secondary: "#16A34A", accent: "#EAB308" }, typography: { heading: "Inter", body: "Inter" } },
   },
-  {
-    id: "map",
-    type: "MAP",
-    content: {
-      heading: "Find Us",
-      location: { address: "123, Main Bazaar, City Center, Your City", lat: 28.7041, lng: 77.1025 },
-    },
-    order: 5,
-    settings: { zoom: 14 },
-  },
-  {
-    id: "footer",
-    type: "FOOTER",
-    content: {
-      text: "© 2025 Your Store. All rights reserved.",
-      socialLinks: { facebook: "", instagram: "", youtube: "" },
-    },
-    order: 6,
-    settings: {},
-  },
-];
-
-const dukaanStyles = {
-  colors: { primary: "#2563EB", secondary: "#1E40AF", accent: "#F59E0B" },
-  typography: { headingFont: "Inter", bodyFont: "Inter", baseSize: "16px" },
-  spacing: { sectionPadding: "4rem", maxWidth: "1200px" },
-};
-
-const swadSections = [
-  {
-    id: "hero",
-    type: "HERO",
-    content: {
-      heading: "Your Restaurant Name",
-      subheading: "Authentic flavours crafted with love — where every meal tells a story.",
-      ctaText: "View Menu",
-      ctaLink: "#services",
-      backgroundImage: "",
-    },
-    order: 0,
-    settings: { fullHeight: true, overlay: true },
-  },
-  {
-    id: "about",
-    type: "ABOUT",
-    content: {
-      heading: "Our Story",
-      content:
-        "Born from a passion for authentic cuisine, our restaurant brings together traditional recipes and fresh local ingredients. Every dish is a celebration of flavour, prepared with care by our expert chefs in a warm and inviting atmosphere.",
-      image: "",
-    },
-    order: 1,
-    settings: { layout: "side-by-side" },
-  },
-  {
-    id: "services",
-    type: "SERVICES",
-    content: {
-      heading: "Our Menu",
-      services: [
-        { title: "Appetizers", description: "Start your meal with our chef's special appetizers.", price: "₹150 - ₹350" },
-        { title: "Main Course", description: "Hearty and flavourful main courses for every palate.", price: "₹250 - ₹650" },
-        { title: "Desserts", description: "Indulge in our handcrafted desserts and sweets.", price: "₹100 - ₹250" },
-      ],
-    },
-    order: 2,
-    settings: { columns: 3 },
-  },
-  {
-    id: "gallery",
-    type: "GALLERY",
-    content: {
-      heading: "Our Ambience & Dishes",
-      images: [],
-    },
-    order: 3,
-    settings: { layout: "grid", columns: 3 },
-  },
-  {
-    id: "testimonials",
-    type: "TESTIMONIALS",
-    content: {
-      heading: "What Our Guests Say",
-      testimonials: [
-        { name: "Priya Sharma", content: "The food was absolutely delicious! Highly recommend the biryani.", rating: 5 },
-        { name: "Rahul Verma", content: "Amazing ambience and great service. A must-visit!", rating: 5 },
-      ],
-    },
-    order: 4,
-    settings: { layout: "carousel", autoplay: true },
-  },
-  {
-    id: "contact",
-    type: "CONTACT",
-    content: {
-      heading: "Reserve a Table",
-      email: "info@restaurant.com",
-      phone: "+91 9876543210",
-      address: "456, Food Street, Sector 22, Your City",
-    },
-    order: 5,
-    settings: {},
-  },
-  {
-    id: "map",
-    type: "MAP",
-    content: {
-      heading: "Find Us",
-      location: { address: "456, Food Street, Sector 22, Your City", lat: 28.7041, lng: 77.1025 },
-    },
-    order: 6,
-    settings: { zoom: 15 },
-  },
-  {
-    id: "footer",
-    type: "FOOTER",
-    content: {
-      text: "© 2025 Your Restaurant. All rights reserved.",
-      socialLinks: { facebook: "", instagram: "", youtube: "" },
-    },
-    order: 7,
-    settings: {},
-  },
-];
-
-const swadStyles = {
-  colors: { primary: "#DC2626", secondary: "#991B1B", accent: "#FBBF24" },
-  typography: { headingFont: "Playfair Display", bodyFont: "Inter", baseSize: "16px" },
-  spacing: { sectionPadding: "4rem", maxWidth: "1200px" },
-};
-
-const saundaryaSections = [
-  {
-    id: "hero",
-    type: "HERO",
-    content: {
-      heading: "Your Salon Name",
-      subheading: "Where beauty meets elegance — transforming your look with expert care.",
-      ctaText: "Book Appointment",
-      ctaLink: "#contact",
-      backgroundImage: "",
-    },
-    order: 0,
-    settings: { fullHeight: true, overlay: true },
-  },
-  {
-    id: "about",
-    type: "ABOUT",
-    content: {
-      heading: "About Us",
-      content:
-        "At our salon, we believe everyone deserves to look and feel their best. Our team of skilled stylists and beauticians use premium products and the latest techniques to deliver personalised beauty experiences in a relaxing environment.",
-      image: "",
-    },
-    order: 1,
-    settings: { layout: "side-by-side" },
-  },
-  {
-    id: "services",
-    type: "SERVICES",
-    content: {
-      heading: "Our Services",
-      services: [
-        { title: "Hair Styling", description: "Cuts, colours, and styling tailored to your personality.", price: "₹300 - ₹2000" },
-        { title: "Facial & Skincare", description: "Rejuvenating facials and skin treatments for a radiant glow.", price: "₹500 - ₹1500" },
-        { title: "Bridal Makeup", description: "Complete bridal packages for your special day.", price: "₹5000 - ₹15000" },
-      ],
-    },
-    order: 2,
-    settings: { columns: 3 },
-  },
-  {
-    id: "gallery",
-    type: "GALLERY",
-    content: {
-      heading: "Our Work",
-      images: [],
-    },
-    order: 3,
-    settings: { layout: "grid", columns: 3 },
-  },
-  {
-    id: "testimonials",
-    type: "TESTIMONIALS",
-    content: {
-      heading: "Client Reviews",
-      testimonials: [
-        { name: "Anjali Mehta", content: "Best salon in town! The stylists really listen to what you want.", rating: 5 },
-        { name: "Neha Gupta", content: "Loved the facial treatment. My skin has never looked better!", rating: 5 },
-      ],
-    },
-    order: 4,
-    settings: { layout: "carousel", autoplay: true },
-  },
-  {
-    id: "contact",
-    type: "CONTACT",
-    content: {
-      heading: "Book Your Appointment",
-      email: "hello@salon.com",
-      phone: "+91 9876543210",
-      address: "789, Beauty Lane, Phase 3, Your City",
-    },
-    order: 5,
-    settings: {},
-  },
-  {
-    id: "map",
-    type: "MAP",
-    content: {
-      heading: "Visit Us",
-      location: { address: "789, Beauty Lane, Phase 3, Your City", lat: 28.7041, lng: 77.1025 },
-    },
-    order: 6,
-    settings: { zoom: 14 },
-  },
-  {
-    id: "footer",
-    type: "FOOTER",
-    content: {
-      text: "© 2025 Your Salon. All rights reserved.",
-      socialLinks: { facebook: "", instagram: "", youtube: "" },
-    },
-    order: 7,
-    settings: {},
-  },
-];
-
-const saundaryaStyles = {
-  colors: { primary: "#DB2777", secondary: "#9D174D", accent: "#F472B6" },
-  typography: { headingFont: "Playfair Display", bodyFont: "Inter", baseSize: "16px" },
-  spacing: { sectionPadding: "4rem", maxWidth: "1200px" },
-};
-
-const sevaSections = [
-  {
-    id: "hero",
-    type: "HERO",
-    content: {
-      heading: "Your Service Name",
-      subheading: "Professional solutions you can trust — delivering excellence every time.",
-      ctaText: "Get a Quote",
-      ctaLink: "#contact",
-      backgroundImage: "",
-    },
-    order: 0,
-    settings: { fullHeight: true, overlay: true },
-  },
-  {
-    id: "about",
-    type: "ABOUT",
-    content: {
-      heading: "Who We Are",
-      content:
-        "We are a team of dedicated professionals committed to providing top-notch services tailored to your needs. With years of experience and a customer-first approach, we ensure every project is delivered with precision, quality, and care.",
-      image: "",
-    },
-    order: 1,
-    settings: { layout: "side-by-side" },
-  },
-  {
-    id: "services",
-    type: "SERVICES",
-    content: {
-      heading: "Our Expertise",
-      services: [
-        { title: "Consultation", description: "In-depth analysis and expert advice tailored to your goals.", price: "₹999+" },
-        { title: "Implementation", description: "End-to-end execution with regular updates and support.", price: "Custom Quote" },
-        { title: "Maintenance", description: "Ongoing support and maintenance to keep things running smoothly.", price: "₹4999/month" },
-      ],
-    },
-    order: 2,
-    settings: { columns: 3 },
-  },
-  {
-    id: "gallery",
-    type: "GALLERY",
-    content: {
-      heading: "Our Work",
-      images: [],
-    },
-    order: 3,
-    settings: { layout: "grid", columns: 3 },
-  },
-  {
-    id: "testimonials",
-    type: "TESTIMONIALS",
-    content: {
-      heading: "Client Feedback",
-      testimonials: [
-        { name: "Amit Khanna", content: "Exceptional service! They went above and beyond our expectations.", rating: 5 },
-        { name: "Sneha Patel", content: "Very professional team. Delivered on time and within budget.", rating: 5 },
-      ],
-    },
-    order: 4,
-    settings: { layout: "carousel", autoplay: true },
-  },
-  {
-    id: "contact",
-    type: "CONTACT",
-    content: {
-      heading: "Let's Work Together",
-      email: "contact@service.com",
-      phone: "+91 9876543210",
-      address: "321, Business Hub, MG Road, Your City",
-    },
-    order: 5,
-    settings: {},
-  },
-  {
-    id: "footer",
-    type: "FOOTER",
-    content: {
-      text: "© 2025 Your Service. All rights reserved.",
-      socialLinks: { facebook: "", instagram: "", linkedin: "" },
-    },
-    order: 6,
-    settings: {},
-  },
-];
-
-const sevaStyles = {
-  colors: { primary: "#059669", secondary: "#047857", accent: "#34D399" },
-  typography: { headingFont: "Inter", bodyFont: "Inter", baseSize: "16px" },
-  spacing: { sectionPadding: "4rem", maxWidth: "1200px" },
-};
-
-const tandrustiSections = [
-  {
-    id: "hero",
-    type: "HERO",
-    content: {
-      heading: "Your Fitness Studio",
-      subheading: "Transform your body, transform your life — your journey to fitness starts here.",
-      ctaText: "Join Now",
-      ctaLink: "#contact",
-      backgroundImage: "",
-    },
-    order: 0,
-    settings: { fullHeight: true, overlay: true },
-  },
-  {
-    id: "about",
-    type: "ABOUT",
-    content: {
-      heading: "Our Mission",
-      content:
-        "We are more than a gym — we are a community dedicated to helping you achieve your fitness goals. Our certified trainers, modern equipment, and supportive environment make fitness accessible and enjoyable for everyone, regardless of your starting point.",
-      image: "",
-    },
-    order: 1,
-    settings: { layout: "side-by-side" },
-  },
-  {
-    id: "services",
-    type: "SERVICES",
-    content: {
-      heading: "Programs",
-      services: [
-        { title: "Personal Training", description: "One-on-one coaching with personalised workout plans.", price: "₹2999/month" },
-        { title: "Group Classes", description: "High-energy sessions like Zumba, Yoga, and HIIT.", price: "₹1499/month" },
-        { title: "Nutrition Plans", description: "Custom diet plans designed by certified nutritionists.", price: "₹999/month" },
-      ],
-    },
-    order: 2,
-    settings: { columns: 3 },
-  },
-  {
-    id: "gallery",
-    type: "GALLERY",
-    content: {
-      heading: "Our Facility",
-      images: [],
-    },
-    order: 3,
-    settings: { layout: "grid", columns: 3 },
-  },
-  {
-    id: "testimonials",
-    type: "TESTIMONIALS",
-    content: {
-      heading: "Member Stories",
-      testimonials: [
-        { name: "Rohit Singh", content: "Lost 15 kg in 3 months! The trainers are incredibly supportive.", rating: 5 },
-        { name: "Kavita Joshi", content: "Best decision I ever made. The group classes are so much fun!", rating: 5 },
-      ],
-    },
-    order: 4,
-    settings: { layout: "carousel", autoplay: true },
-  },
-  {
-    id: "contact",
-    type: "CONTACT",
-    content: {
-      heading: "Start Your Journey",
-      email: "info@fitness.com",
-      phone: "+91 9876543210",
-      address: "555, Wellness Avenue, Sports Complex, Your City",
-    },
-    order: 5,
-    settings: {},
-  },
-  {
-    id: "map",
-    type: "MAP",
-    content: {
-      heading: "Find Us",
-      location: { address: "555, Wellness Avenue, Sports Complex, Your City", lat: 28.7041, lng: 77.1025 },
-    },
-    order: 6,
-    settings: { zoom: 14 },
-  },
-  {
-    id: "footer",
-    type: "FOOTER",
-    content: {
-      text: "© 2025 Your Fitness Studio. All rights reserved.",
-      socialLinks: { facebook: "", instagram: "", youtube: "" },
-    },
-    order: 7,
-    settings: {},
-  },
-];
-
-const tandrustiStyles = {
-  colors: { primary: "#7C3AED", secondary: "#5B21B6", accent: "#F97316" },
-  typography: { headingFont: "Inter", bodyFont: "Inter", baseSize: "16px" },
-  spacing: { sectionPadding: "4rem", maxWidth: "1200px" },
-};
+]
 
 async function main() {
-  await prisma.$executeRaw`TRUNCATE TABLE "Template" RESTART IDENTITY CASCADE;`;
+  console.log("Clearing existing templates...")
+  await prisma.template.deleteMany()
 
-  await prisma.template.createMany({
-    data: [
-      {
-        name: "Dukaan",
-        description: "Modern storefront template for retail shops and e-commerce stores.",
-        category: BusinessCategory.SHOP,
-        thumbnail: "",
-        popular: true,
-        sections: dukaanSections,
-        styles: dukaanStyles,
-      },
-      {
-        name: "Swad",
-        description: "Delicious restaurant template for cafes, dhabas, and fine dining.",
-        category: BusinessCategory.RESTAURANT,
-        thumbnail: "",
-        popular: true,
-        sections: swadSections,
-        styles: swadStyles,
-      },
-      {
-        name: "Saundarya",
-        description: "Elegant salon template for beauty parlours and unisex salons.",
-        category: BusinessCategory.SALON,
-        thumbnail: "",
-        popular: false,
-        sections: saundaryaSections,
-        styles: saundaryaStyles,
-      },
-      {
-        name: "Seva",
-        description: "Professional service provider template for agencies and consultants.",
-        category: BusinessCategory.SERVICE,
-        thumbnail: "",
-        popular: false,
-        sections: sevaSections,
-        styles: sevaStyles,
-      },
-      {
-        name: "Tandrusti",
-        description: "Energetic fitness template for gyms, yoga studios, and trainers.",
-        category: BusinessCategory.FITNESS,
-        thumbnail: "",
-        popular: false,
-        sections: tandrustiSections,
-        styles: tandrustiStyles,
-      },
-    ],
-  });
+  console.log("Seeding templates...")
+  for (const t of templates) {
+    await prisma.template.create({ data: t })
+    console.log(`  ✅ ${t.name}`)
+  }
+
+  console.log("Done! Templates seeded successfully.")
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().catch((e) => {
+  console.error(e)
+  process.exit(1)
+}).finally(() => prisma.$disconnect())
