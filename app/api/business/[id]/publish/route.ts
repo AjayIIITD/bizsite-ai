@@ -12,8 +12,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const { id } = await params
 
   try {
-    const business = await prisma.business.findUnique({
-      where: { id },
+    const business = await prisma.business.findFirst({
+      where: { OR: [{ id }, { slug: id }] },
       include: { website: true },
     })
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     await prisma.business.update({
-      where: { id },
+      where: { id: business.id },
       data: {
         siteStatus: "PUBLISHED",
         publishedAt: new Date(),
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     })
 
     await prisma.website.update({
-      where: { businessId: id },
+      where: { businessId: business.id },
       data: {
         publishedVersion: {
           sections: business.website.sections,

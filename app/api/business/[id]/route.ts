@@ -10,8 +10,8 @@ export async function GET(
 ) {
   const { id } = await params
 
-  const business = await prisma.business.findUnique({
-    where: { id },
+  const business = await prisma.business.findFirst({
+    where: { OR: [{ id }, { slug: id }] },
     include: { website: true },
   })
 
@@ -33,7 +33,7 @@ export async function PUT(
 
   const { id } = await params
 
-  const business = await prisma.business.findUnique({ where: { id } })
+  const business = await prisma.business.findFirst({ where: { OR: [{ id }, { slug: id }] } })
   if (!business) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
@@ -49,7 +49,7 @@ export async function PUT(
   }
 
   const updated = await prisma.business.update({
-    where: { id },
+    where: { id: business.id },
     data: parsed.data,
   })
 
@@ -67,7 +67,7 @@ export async function DELETE(
 
   const { id } = await params
 
-  const business = await prisma.business.findUnique({ where: { id } })
+  const business = await prisma.business.findFirst({ where: { OR: [{ id }, { slug: id }] } })
   if (!business) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
@@ -76,7 +76,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  await prisma.business.delete({ where: { id } })
+  await prisma.business.delete({ where: { id: business.id } })
 
   return NextResponse.json({ success: true })
 }

@@ -6,8 +6,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { id } = await params
 
   try {
-    const business = await prisma.business.findUnique({
-      where: { id },
+    const business = await prisma.business.findFirst({
+      where: { OR: [{ id }, { slug: id }] },
       include: { website: true },
     })
 

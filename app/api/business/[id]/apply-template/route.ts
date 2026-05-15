@@ -15,7 +15,7 @@ export async function POST(
 
   const { id } = await params
 
-  const business = await prisma.business.findUnique({ where: { id } })
+  const business = await prisma.business.findFirst({ where: { OR: [{ id }, { slug: id }] } })
   if (!business) {
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
@@ -39,7 +39,7 @@ export async function POST(
   }
 
   await prisma.website.update({
-    where: { businessId: id },
+    where: { businessId: business.id },
     data: {
       sections: template.sections as any,
       styles: template.styles as any,

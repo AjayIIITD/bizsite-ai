@@ -7,8 +7,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { id } = await params
 
   try {
-    const business = await prisma.business.findUnique({
-      where: { id },
+    const business = await prisma.business.findFirst({
+      where: { OR: [{ id }, { slug: id }] },
       include: { website: true },
     })
 
@@ -46,7 +46,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   const { id } = await params
 
   try {
-    const business = await prisma.business.findUnique({ where: { id }, select: { userId: true } })
+    const business = await prisma.business.findFirst({ where: { OR: [{ id }, { slug: id }] }, include: { website: true } })
     if (!business || business.userId !== session.user.id) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
@@ -54,18 +54,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const body = await request.json()
     const { sections, styles } = body
 
-    const existing = await prisma.website.findUnique({
-      where: { businessId: id },
-    })
-
-    if (existing) {
+    if (business.website) {
       await prisma.website.update({
-        where: { businessId: id },
+        where: { id: business.website.id },
         data: { sections, styles, lastEditedAt: new Date() },
       })
     } else {
       await prisma.website.create({
-        data: { businessId: id, sections, styles },
+        data: { businessId: business.id, sections, styles },
       })
     }
 
