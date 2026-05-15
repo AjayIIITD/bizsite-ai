@@ -53,10 +53,10 @@ export default function TemplatesPage() {
       if (!res.ok) throw new Error("Not found")
       const business = await res.json()
 
-      const applyRes = await fetch(`/api/templates/${templateId}/apply`, {
+      const applyRes = await fetch(`/api/business/${business.id}/apply-template`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ businessId: business.id }),
+        body: JSON.stringify({ template_id: templateId }),
       })
       if (!applyRes.ok) throw new Error("Failed to apply template")
       setAppliedId(templateId)

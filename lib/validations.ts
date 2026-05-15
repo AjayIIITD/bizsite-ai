@@ -8,6 +8,7 @@ export const businessSchema = z.object({
   phone: z.string().optional().default(""),
   email: z.string().optional().default(""),
   address: z.string().optional().default(""),
+  city: z.string().optional().default(""),
   logo: z.string().optional().default(""),
 })
 

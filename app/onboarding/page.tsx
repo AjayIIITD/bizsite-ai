@@ -154,15 +154,15 @@ export default function OnboardingPage() {
 
       // 2. Apply template
       if (selectedTemplate) {
-        await fetch(`/api/templates/${selectedTemplate.id}/apply`, {
+        await fetch(`/api/business/${business.id}/apply-template`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ businessId: business.id }),
+          body: JSON.stringify({ template_id: selectedTemplate.id }),
         })
       }
 
       // 3. Publish
-      const pubRes = await fetch(`/api/site/${business.id}/publish`, {
+      const pubRes = await fetch(`/api/business/${business.id}/publish`, {
         method: "POST",
       })
       if (!pubRes.ok) {

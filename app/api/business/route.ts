@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
   }
 
-  const { name, category, description, tagline, phone, email, address, logo } = parsed.data
+  const { name, category, description, tagline, phone, email, address, logo, city } = parsed.data
 
   let slug = generateSlug(name)
   const existing = await prisma.business.findUnique({ where: { slug } })
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
         tagline,
         phone,
         email,
-        address,
+        address: city ? `${address || ""}, ${city}` : address,
         logo,
         userId: session.user!.id!,
         website: {
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
 
     const template = await tx.template.findFirst({
       where: { category },
-      orderBy: { isDefault: "desc" },
+      orderBy: { popular: "desc" },
     })
 
     if (template) {
